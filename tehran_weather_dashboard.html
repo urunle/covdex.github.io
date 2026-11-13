@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#07100d" />
+  <meta name="description" content="A synoptic station study of daily maximum and minimum temperatures in Tehran-Mehrabad, Iran, during July 2024." />
+  <title>Tehran / July 2024 — Synoptic Weather Study</title>
+  <style>
+    :root {
+      --bg: #07100d;
+      --bg-soft: #0a1511;
+      --panel: #101e18;
+      --panel-2: #13241c;
+      --panel-3: #182b22;
+      --line: rgba(207, 226, 211, .11);
+      --line-strong: rgba(207, 226, 211, .18);
+      --text: #f0f4ed;
+      --muted: #95a69a;
+      --muted-2: #687d70;
+      --lime: #c8f169;
+      --lime-dim: #9dbd4c;
+      --warm: #e7a66b;
+      --cold: #91b6a2;
+      --radius: 20px;
+      --shadow: 0 24px 70px rgba(0,0,0,.22);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 88% -8%, rgba(117,151,79,.12), transparent 62%),
+        radial-gradient(800px 500px at -15% 40%, rgba(52,91,67,.13), transparent 60%),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: -.015em;
+      line-height: 1.5;
+    }
+    a { color: inherit; }
+    button { font: inherit; }
+    .shell { width: min(1240px, calc(100% - 56px)); margin: 0 auto; }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 26px 0 25px; border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .brand-mark {
+      width: 34px; height: 34px; border: 1px solid rgba(200,241,105,.48); border-radius: 11px;
+      display: grid; place-items: center; color: var(--lime); background: rgba(200,241,105,.07);
+    }
+    .brand-name { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; font-weight: 750; }
+    .brand-sub { color: var(--muted-2); font-size: 10px; letter-spacing: .13em; text-transform: uppercase; margin-top: 1px; }
+    .nav { display: flex; gap: 28px; align-items: center; }
+    .nav a { text-decoration: none; color: var(--muted); font-size: 12px; transition: color .2s ease; }
+    .nav a:hover { color: var(--lime); }
+    .period-pill {
+      border: 1px solid var(--line-strong); border-radius: 999px; padding: 8px 13px;
+      color: #c8d3ca; font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+      display: flex; gap: 8px; align-items: center;
+    }
+    .hero { padding: 70px 0 45px; display: grid; grid-template-columns: 1.25fr .75fr; gap: 48px; align-items: end; }
+    .eyebrow { color: var(--lime); font-size: 10px; letter-spacing: .2em; font-weight: 750; text-transform: uppercase; display: flex; gap: 10px; align-items: center; }
+    .eyebrow:before { content: ""; display: block; width: 24px; height: 1px; background: var(--lime); }
+    h1 { font-size: clamp(48px, 7.3vw, 88px); line-height: .99; letter-spacing: -.075em; font-weight: 610; margin: 19px 0 20px; max-width: 760px; }
+    h1 em { color: var(--lime); font-style: normal; }
+    .hero-copy { color: #a9b8ad; max-width: 580px; font-size: 15px; line-height: 1.75; margin: 0; }
+    .hero-meta { margin-top: 30px; display: flex; gap: 25px; flex-wrap: wrap; }
+    .meta-item { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 11px; }
+    .meta-item svg { color: var(--lime-dim); }
+    .mean-card {
+      background: linear-gradient(145deg, rgba(24,43,34,.95), rgba(13,27,20,.96));
+      border: 1px solid rgba(200,241,105,.22); border-radius: 24px; padding: 27px 28px 25px;
+      box-shadow: var(--shadow); position: relative; overflow: hidden; min-height: 245px;
+    }
+    .mean-card:after {
+      content: ""; position: absolute; width: 230px; height: 230px; border: 1px solid rgba(200,241,105,.12);
+      border-radius: 50%; right: -100px; top: -110px; box-shadow: 0 0 0 23px rgba(200,241,105,.025), 0 0 0 50px rgba(200,241,105,.018);
+    }
+    .card-kicker { color: var(--muted); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; }
+    .mean-number { font-size: clamp(62px, 7vw, 84px); line-height: 1; letter-spacing: -.08em; font-weight: 570; margin: 27px 0 10px; position: relative; z-index: 1; }
+    .mean-number span { color: var(--lime); font-size: .42em; vertical-align: top; letter-spacing: -.04em; margin-left: 5px; }
+    .mean-caption { color: #b3c0b5; font-size: 12px; position: relative; z-index: 1; }
+    .mean-equation { color: var(--muted-2); font-size: 10px; margin-top: 19px; letter-spacing: .035em; position: relative; z-index: 1; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 18px; margin: 22px 0 17px; }
+    .section-index { color: var(--lime); font-size: 10px; letter-spacing: .17em; font-weight: 750; text-transform: uppercase; margin-bottom: 8px; }
+    h2 { font-size: 23px; line-height: 1.1; letter-spacing: -.045em; font-weight: 590; margin: 0; }
+    .section-note { color: var(--muted); font-size: 11px; max-width: 350px; text-align: right; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .stat {
+      padding: 20px 21px; background: rgba(16,30,24,.78); border: 1px solid var(--line); border-radius: 16px; min-height: 130px;
+    }
+    .stat-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+    .stat-icon { color: var(--lime-dim); }
+    .stat-value { font-size: 34px; letter-spacing: -.065em; margin-top: 19px; font-weight: 560; }
+    .stat-value small { font-size: 14px; color: var(--muted); letter-spacing: -.02em; margin-left: 2px; }
+    .stat-detail { font-size: 10px; color: var(--muted-2); margin-top: 2px; }
+    .panel {
+      background: rgba(15,29,23,.82); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 18px 50px rgba(0,0,0,.12);
+    }
+    .chart-panel { margin-top: 15px; padding: 24px 24px 17px; }
+    .chart-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+    .legend { display: flex; gap: 19px; align-items: center; flex-wrap: wrap; color: var(--muted); font-size: 10px; }
+    .legend-item { display: flex; align-items: center; gap: 7px; }
+    .legend-range { width: 4px; height: 15px; border-radius: 3px; background: #6c9273; }
+    .legend-mean { width: 18px; height: 2px; background: var(--lime); position: relative; }
+    .legend-mean:after { content: ""; position: absolute; width: 5px; height: 5px; border-radius: 50%; background: var(--lime); left: 7px; top: -1.5px; }
+    .chart-label { display: flex; gap: 7px; color: var(--muted-2); align-items: center; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+    .chart-wrap { margin-top: 14px; width: 100%; overflow: hidden; }
+    #temperature-chart { width: 100%; height: auto; display: block; overflow: visible; }
+    .chart-caption { display: flex; justify-content: space-between; color: var(--muted-2); font-size: 10px; padding: 0 4px 3px; }
+    .lower-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 15px; }
+    .insight-card { padding: 23px 24px; }
+    .insight-title { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .14em; }
+    .insight-big { font-size: 36px; letter-spacing: -.07em; margin: 22px 0 5px; }
+    .insight-big span { color: var(--lime); font-size: 15px; letter-spacing: -.02em; }
+    .insight-copy { color: #a1b1a5; font-size: 12px; line-height: 1.7; max-width: 450px; }
+    .extreme-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 11px 0; border-top: 1px solid var(--line); }
+    .extreme-label { color: var(--muted); font-size: 11px; display: flex; align-items: center; gap: 8px; }
+    .extreme-val { font-size: 18px; letter-spacing: -.04em; }
+    .extreme-val small { color: var(--muted-2); font-size: 10px; margin-left: 5px; letter-spacing: 0; }
+    .method { margin-top: 48px; display: grid; grid-template-columns: .7fr 1.3fr; gap: 50px; align-items: start; }
+    .method-intro p { color: var(--muted); font-size: 12px; line-height: 1.8; max-width: 330px; }
+    .formula-box { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px 24px; }
+    .formula-label { color: var(--muted); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
+    .formula { color: var(--lime); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: clamp(18px, 2.5vw, 25px); letter-spacing: -.055em; padding: 18px 0 10px; }
+    .formula-foot { color: var(--muted-2); font-size: 11px; line-height: 1.75; }
+    .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; margin-top: 15px; }
+    .step { background: rgba(19,36,28,.7); border: 1px solid var(--line); padding: 14px; border-radius: 12px; }
+    .step b { color: var(--lime); font-size: 10px; display: block; margin-bottom: 6px; letter-spacing: .1em; }
+    .step span { color: #aab8ad; font-size: 10px; line-height: 1.6; display: block; }
+    .data-section { margin-top: 49px; }
+    .table-head { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 17px; }
+    .table-actions { display: flex; gap: 8px; align-items: center; }
+    .button {
+      appearance: none; border: 1px solid var(--line-strong); background: transparent; color: #d6e0d7;
+      border-radius: 999px; padding: 9px 13px; font-size: 10px; cursor: pointer; transition: all .18s ease;
+    }
+    .button:hover { border-color: rgba(200,241,105,.6); color: var(--lime); background: rgba(200,241,105,.05); }
+    .button.primary { background: var(--lime); color: #172213; border-color: var(--lime); font-weight: 750; }
+    .button.primary:hover { background: #d8ff83; }
+    .table-wrap { overflow-x: auto; border-radius: 17px; }
+    table { width: 100%; border-collapse: collapse; min-width: 580px; }
+    thead { background: rgba(24,43,34,.88); }
+    th { color: var(--muted); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; text-align: left; padding: 14px 19px; font-weight: 650; }
+    td { padding: 11px 19px; border-top: 1px solid var(--line); color: #c6d1c8; font-size: 11px; font-variant-numeric: tabular-nums; }
+    tbody tr:hover { background: rgba(200,241,105,.035); }
+    td:first-child { color: var(--muted); width: 19%; }
+    td.mean-cell { color: var(--lime); font-weight: 650; }
+    .temp-high { color: #e7b37e; }
+    .temp-low { color: #9cb9a8; }
+    .note {
+      margin-top: 15px; padding: 16px 18px; border: 1px solid rgba(200,241,105,.18); border-radius: 14px;
+      background: rgba(200,241,105,.035); color: #aab8ad; font-size: 11px; line-height: 1.7;
+    }
+    .note strong { color: #dce8d0; font-weight: 650; }
+    .sources { margin-top: 47px; padding: 26px 0 34px; border-top: 1px solid var(--line); display: grid; grid-template-columns: .75fr 1.25fr; gap: 38px; }
+    .sources h3 { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; margin: 0; color: var(--muted); }
+    .source-list { display: grid; gap: 13px; }
+    .source-link { color: #dce6db; text-decoration: none; font-size: 11px; display: flex; gap: 10px; align-items: flex-start; }
+    .source-link svg { color: var(--lime-dim); flex: 0 0 auto; margin-top: 1px; }
+    .source-link span { color: var(--muted-2); display: block; margin-top: 3px; font-size: 10px; }
+    .footer { border-top: 1px solid var(--line); padding: 17px 0 25px; display: flex; justify-content: space-between; gap: 16px; color: var(--muted-2); font-size: 9px; letter-spacing: .09em; text-transform: uppercase; }
+    .toast { position: fixed; bottom: 22px; left: 50%; transform: translate(-50%, 14px); opacity: 0; pointer-events: none; background: var(--lime); color: #142012; padding: 10px 15px; border-radius: 999px; font-size: 11px; font-weight: 700; transition: all .25s ease; box-shadow: 0 8px 30px rgba(0,0,0,.3); }
+    .toast.show { opacity: 1; transform: translate(-50%,0); }
+    @media (max-width: 850px) {
+      .hero { grid-template-columns: 1fr; gap: 27px; padding-top: 55px; }
+      .mean-card { min-height: 210px; }
+      .stats { grid-template-columns: repeat(2,1fr); }
+      .method { grid-template-columns: 1fr; gap: 18px; }
+      .method-intro p { max-width: 620px; }
+    }
+    @media (max-width: 600px) {
+      .shell { width: min(100% - 32px, 1240px); }
+      .topbar { padding: 19px 0; }
+      .nav { display: none; }
+      .period-pill { font-size: 9px; padding: 7px 9px; }
+      .hero { padding: 46px 0 30px; }
+      h1 { font-size: clamp(46px, 14vw, 66px); }
+      .hero-copy { font-size: 13px; }
+      .hero-meta { gap: 13px 18px; }
+      .mean-card { padding: 23px; }
+      .stats { gap: 8px; }
+      .stat { padding: 15px; min-height: 115px; }
+      .stat-value { font-size: 29px; }
+      .section-head, .table-head { align-items: flex-start; flex-direction: column; }
+      .section-note { text-align: left; }
+      .chart-panel { padding: 17px 12px 13px; }
+      .chart-toolbar { align-items: flex-start; flex-direction: column; }
+      .legend { gap: 12px; }
+      .lower-grid { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; }
+      .sources { grid-template-columns: 1fr; gap: 18px; }
+      .footer { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Synoptic Study home">
+        <span class="brand-mark">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12m9.9 9.9 2.12 2.12M2 12h3m14 0h3M4.93 19.07l2.12-2.12m9.9-9.9 2.12-2.12"/></svg>
+        </span>
+        <span><span class="brand-name">Field Notes / Climate</span><span class="brand-sub">Synoptic station study</span></span>
+      </a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="#overview">Overview</a><a href="#method">Method</a><a href="#daily-data">Daily data</a><a href="#sources">Sources</a>
+      </nav>
+      <div class="period-pill"><span style="color:var(--lime)">●</span> July 2024 · Iran</div>
+    </header>
+
+    <main id="top">
+      <section class="hero" id="overview">
+        <div>
+          <div class="eyebrow">Station report / 01</div>
+          <h1>A month of<br /><em>summer heat.</em></h1>
+          <p class="hero-copy">A 31-day temperature study of Tehran–Mehrabad, using daily maximum and minimum air temperatures from a synoptic weather station. The monthly mean is derived from the midpoint of each day’s temperature range.</p>
+          <div class="hero-meta">
+            <div class="meta-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg> Tehran–Mehrabad, Iran</div>
+            <div class="meta-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 9h18"/></svg> 01—31 July 2024</div>
+            <div class="meta-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"/></svg> Station ID 407540 / OIII</div>
+          </div>
+        </div>
+        <aside class="mean-card" aria-label="Calculated monthly mean temperature">
+          <div class="card-kicker">Calculated monthly mean temperature</div>
+          <div class="mean-number">31.75<span>°C</span></div>
+          <div class="mean-caption">Based on 31 daily maximum / minimum pairs</div>
+          <div class="mean-equation">Σ daily midpoint temperatures ÷ 31 days</div>
+        </aside>
+      </section>
+
+      <section aria-labelledby="snapshot-title">
+        <div class="section-head">
+          <div><div class="section-index">01 / Monthly snapshot</div><h2 id="snapshot-title">The month, in four numbers.</h2></div>
+          <div class="section-note">Temperature values in degrees Celsius · Full 31-day record</div>
+        </div>
+        <div class="stats">
+          <article class="stat"><div class="stat-top"><span>Mean daily high</span><svg class="stat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3v18M5 12l7-9 7 9"/></svg></div><div class="stat-value">37.96<small>°C</small></div><div class="stat-detail">Average of daily maximums</div></article>
+          <article class="stat"><div class="stat-top"><span>Mean daily low</span><svg class="stat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3v18M5 12l7 9 7-9"/></svg></div><div class="stat-value">25.54<small>°C</small></div><div class="stat-detail">Average of daily minimums</div></article>
+          <article class="stat"><div class="stat-top"><span>Highest maximum</span><svg class="stat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3v18M5 12l7-9 7 9"/><path d="M4 21h16"/></svg></div><div class="stat-value">41.7<small>°C</small></div><div class="stat-detail">27 July · Peak daytime heat</div></article>
+          <article class="stat"><div class="stat-top"><span>Lowest minimum</span><svg class="stat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3v18M5 12l7 9 7-9"/><path d="M4 3h16"/></svg></div><div class="stat-value">21.0<small>°C</small></div><div class="stat-detail">29 July · Coolest daily low</div></article>
+        </div>
+      </section>
+
+      <section class="panel chart-panel" aria-labelledby="chart-title">
+        <div class="chart-toolbar">
+          <div><div class="section-index">02 / Daily temperature profile</div><h2 id="chart-title">The range, day by day.</h2></div>
+          <div class="legend">
+            <span class="legend-item"><i class="legend-range"></i> Daily min–max range</span>
+            <span class="legend-item"><i class="legend-mean"></i> Daily midpoint</span>
+          </div>
+        </div>
+        <div class="chart-wrap"><svg id="temperature-chart" viewBox="0 0 1000 315" role="img" aria-label="Daily minimum to maximum temperature range chart for July 2024"></svg></div>
+        <div class="chart-caption"><span>01 JUL</span><span>Daily values · °C</span><span>31 JUL</span></div>
+      </section>
+
+      <div class="lower-grid">
+        <article class="panel insight-card">
+          <div class="insight-title"><span>Day–night contrast</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--lime-dim)" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></div>
+          <div class="insight-big">12.42<span>°C average range</span></div>
+          <div class="insight-copy">On an average day, the maximum temperature was about 12.42°C higher than the minimum. The widest daily range was 16.8°C on July 29.</div>
+        </article>
+        <article class="panel insight-card">
+          <div class="insight-title"><span>Observed extremes</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--lime-dim)" stroke-width="1.5" stroke-linecap="round"><path d="M12 3v18M5 12l7-9 7 9M5 12l7 9 7-9"/></svg></div>
+          <div class="extreme-row" style="margin-top:17px"><div class="extreme-label"><span style="color:var(--warm)">↗</span> Maximum air temperature</div><div class="extreme-val">41.7°<small>27 JUL</small></div></div>
+          <div class="extreme-row"><div class="extreme-label"><span style="color:var(--cold)">↘</span> Minimum air temperature</div><div class="extreme-val">21.0°<small>29 JUL</small></div></div>
+          <div class="extreme-row"><div class="extreme-label">Full observed span</div><div class="extreme-val">20.7°<small>°C</small></div></div>
+        </article>
+      </div>
+
+      <section class="method" id="method">
+        <div class="method-intro">
+          <div class="section-index">03 / Calculation method</div>
+          <h2>From daily extremes<br />to one monthly mean.</h2>
+          <p>For each date, the daily mean is estimated as the arithmetic midpoint between the observed maximum and minimum. The 31 daily estimates are then averaged to obtain one monthly value.</p>
+        </div>
+        <div>
+          <div class="formula-box">
+            <div class="formula-label">Formula used in this exercise</div>
+            <div class="formula">T̄<sub>month</sub> = (1 / 31) × Σ [(T<sub>max</sub> + T<sub>min</sub>) / 2]</div>
+            <div class="formula-foot">The sum of the 31 daily midpoint temperatures is 984.2°C. Dividing by 31 gives 31.7484°C, rounded to 31.75°C.</div>
+          </div>
+          <div class="steps">
+            <div class="step"><b>STEP 01</b><span>Collect the maximum and minimum temperatures for every day.</span></div>
+            <div class="step"><b>STEP 02</b><span>Calculate each daily midpoint: (Tmax + Tmin) ÷ 2.</span></div>
+            <div class="step"><b>STEP 03</b><span>Add all daily midpoints and divide by 31.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="data-section" id="daily-data">
+        <div class="table-head">
+          <div><div class="section-index">04 / Source observations</div><h2>Daily temperature log.</h2></div>
+          <div class="table-actions"><button class="button" id="csv-button" type="button">↓ &nbsp; Download CSV</button><a class="button primary" href="#sources" style="text-decoration:none">View data source ↗</a></div>
+        </div>
+        <div class="panel table-wrap">
+          <table>
+            <thead><tr><th>Day · July 2024</th><th>Maximum · °C</th><th>Minimum · °C</th><th>Daily midpoint · °C</th></tr></thead>
+            <tbody id="daily-table"></tbody>
+          </table>
+        </div>
+        <div class="note"><strong>Method note.</strong> The 31.75°C result is the monthly mean calculated from daily maximum/minimum midpoints, as required by this exercise. The source page also lists a separate monthly average of 32.3°C based on its daily-average temperature field. That independently reported value is not the midpoint-based calculation shown here; the two methods should not be mixed.</div>
+      </section>
+
+      <section class="sources" id="sources">
+        <h3>Station & data provenance</h3>
+        <div class="source-list">
+          <a class="source-link" href="https://en.tutiempo.net/climate/07-2024/ws-407540.html" target="_blank" rel="noopener noreferrer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7M10 14 21 3M19 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"/></svg>
+            <div>Tehran–Mehrabad · July 2024 daily climate table<span>Daily maximum and minimum temperatures; source page attributes the data to NOAA.</span></div>
+          </a>
+          <a class="source-link" href="https://www.ncei.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND%3AIR000407540/detail" target="_blank" rel="noopener noreferrer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7M10 14 21 3M19 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"/></svg>
+            <div>NOAA / National Centers for Environmental Information<span>GHCN-Daily station record: TEHRAN MEHRABAD, IR · IR000407540.</span></div>
+          </a>
+          <div class="source-link" style="cursor:default">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>
+            <div>Station details<span>Synoptic station 407540 / OIII · 35.68° N, 51.35° E · 1,204 m elevation (as listed on the monthly data page).</span>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="footer"><span>Climate field notes · Academic exercise</span><span>Tehran, Iran · July 2024</span><span>All temperatures in °C</span></footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite">CSV exported</div>
+
+  <script>
+    const observations = [
+      [1,35.0,22.5],[2,36.6,25.0],[3,36.0,22.6],[4,38.6,24.0],[5,39.3,26.0],
+      [6,38.0,28.0],[7,37.4,28.0],[8,37.2,27.0],[9,38.5,27.0],[10,39.6,27.0],
+      [11,38.4,27.0],[12,37.7,26.5],[13,36.9,26.6],[14,35.0,25.0],[15,35.0,24.0],
+      [16,36.6,25.6],[17,38.2,26.4],[18,38.0,26.0],[19,37.0,25.6],[20,37.0,25.9],
+      [21,39.1,26.0],[22,37.7,24.0],[23,38.2,27.0],[24,39.1,28.5],[25,40.3,26.0],
+      [26,40.1,25.4],[27,41.7,26.0],[28,40.4,24.0],[29,37.8,21.0],[30,35.3,21.1],[31,41.0,27.0]
+    ];
+    const fmt = n => Number(n).toFixed(2);
+    const midpoint = ([, max, min]) => (max + min) / 2;
+
+    // Populate all 31 rows from one observation array so the chart and table stay consistent.
+    const tbody = document.getElementById('daily-table');
+    tbody.innerHTML = observations.map(row => {
+      const [day, max, min] = row;
+      return `<tr><td>${String(day).padStart(2,'0')} July</td><td class="temp-high">${max.toFixed(1)}</td><td class="temp-low">${min.toFixed(1)}</td><td class="mean-cell">${fmt(midpoint(row))}</td></tr>`;
+    }).join('');
+
+    // Draw a lightweight SVG range plot with a connected daily-midpoint line.
+    const svg = document.getElementById('temperature-chart');
+    const ns = 'http://www.w3.org/2000/svg';
+    const chartLeft = 55, chartRight = 975, chartTop = 24, chartBottom = 258;
+    const x = i => chartLeft + (chartRight-chartLeft) * i / (observations.length - 1);
+    const y = value => chartBottom - (value - 18) / (44 - 18) * (chartBottom - chartTop);
+    const add = (tag, attrs, parent = svg, content = '') => {
+      const el = document.createElementNS(ns, tag);
+      Object.entries(attrs).forEach(([key,val]) => el.setAttribute(key, val));
+      if (content) el.textContent = content;
+      parent.appendChild(el);
+      return el;
+    };
+    [20,25,30,35,40].forEach(tick => {
+      const yy = y(tick);
+      add('line',{x1:chartLeft,y1:yy,x2:chartRight,y2:yy,stroke:'rgba(207,226,211,.12)','stroke-width':1,'stroke-dasharray':'3 7'});
+      add('text',{x:8,y:yy+4,fill:'#718578','font-size':10,'font-family':'Inter, sans-serif'},svg,String(tick)+'°');
+    });
+    const points = [];
+    observations.forEach((row,i) => {
+      const [day,max,min] = row;
+      const xx = x(i), yyMax = y(max), yyMin = y(min), yyMean = y(midpoint(row));
+      add('line',{x1:xx,y1:yyMax,x2:xx,y2:yyMin,stroke:'#688d70','stroke-width':5,'stroke-linecap':'round',opacity:.88});
+      add('circle',{cx:xx,cy:yyMax,r:2.7,fill:'#c8f169'});
+      add('circle',{cx:xx,cy:yyMin,r:2.5,fill:'#8da99a'});
+      points.push(`${xx},${yyMean}`);
+      const group = add('g',{'aria-label':`July ${day}`});
+      add('title',{},group,`July ${day}: max ${max.toFixed(1)}°C · min ${min.toFixed(1)}°C · midpoint ${midpoint(row).toFixed(2)}°C`);
+      // A transparent hit area makes the daily tooltip easy to trigger.
+      add('rect',{x:xx-10,y:chartTop,width:20,height:chartBottom-chartTop,fill:'transparent','pointer-events':'none'},group);
+    });
+    add('polyline',{points:points.join(' '),fill:'none',stroke:'#c8f169','stroke-width':2.1,'stroke-linejoin':'round','stroke-linecap':'round'});
+    observations.forEach((row,i) => {
+      add('circle',{cx:x(i),cy:y(midpoint(row)),r:3.1,fill:'#c8f169',stroke:'#102017','stroke-width':1.4});
+    });
+    [1,5,10,15,20,25,31].forEach(day => {
+      const xx = x(day-1);
+      add('text',{x:xx,y:285,fill:'#718578','font-size':10,'text-anchor':'middle','font-family':'Inter, sans-serif'},svg,String(day).padStart(2,'0'));
+    });
+
+    document.getElementById('csv-button').addEventListener('click', () => {
+      const lines = [['Day','Date','Maximum temperature (°C)','Minimum temperature (°C)','Daily midpoint (°C)']];
+      observations.forEach(([day,max,min]) => lines.push([day,`2024-07-${String(day).padStart(2,'0')}`,max.toFixed(1),min.toFixed(1),midpoint([day,max,min]).toFixed(2)]));
+      const csv = lines.map(row => row.join(',')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'tehran-mehrabad-july-2024-temperature.csv';
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      const toast = document.getElementById('toast'); toast.classList.add('show');
+      window.setTimeout(() => toast.classList.remove('show'), 2200);
+    });
+  </script>
+</body>
+</html>
