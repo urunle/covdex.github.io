@@ -1,0 +1,726 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kerman Humidity Analysis | August 2024</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root{
+  --bg:#0b1510;
+  --card:#14251b;
+  --card2:#1c3023;
+  --lime:#C8F169;
+  --white:#edf3e9;
+  --muted:#91a394;
+  --blue:#82b8d5;
+  --orange:#e7a66b;
+  --border:rgba(255,255,255,.09);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  background:var(--bg);
+  color:var(--white);
+  font-family:Inter,Arial,sans-serif;
+  padding:35px 6%;
+}
+
+.container{max-width:1350px;margin:auto}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:55px;
+}
+
+.logo{
+  color:var(--lime);
+  font-size:12px;
+  letter-spacing:3px;
+  font-weight:bold;
+}
+
+.date{color:var(--muted);font-size:12px}
+
+.hero{margin-bottom:40px}
+
+.hero small{
+  color:var(--lime);
+  letter-spacing:3px;
+  font-size:11px;
+}
+
+h1{
+  font-size:clamp(40px,7vw,78px);
+  line-height:1.05;
+  margin:20px 0;
+  letter-spacing:-3px;
+}
+
+h1 span{color:var(--lime)}
+
+.hero p{
+  color:var(--muted);
+  line-height:1.9;
+  max-width:700px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin:30px 0;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:25px;
+  margin-bottom:20px;
+}
+
+.label{
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:1px;
+  margin-bottom:17px;
+}
+
+.value{
+  font-size:36px;
+  color:var(--lime);
+  font-weight:bold;
+}
+
+.unit{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:5px;
+}
+
+h2{font-size:21px;margin-bottom:10px}
+
+.subtitle{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.8;
+  margin-bottom:25px;
+}
+
+.chartbox{
+  height:420px;
+  position:relative;
+}
+
+.baseline{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-top:20px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.baseline-line{
+  width:35px;
+  border-top:2px dashed var(--lime);
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+  min-width:650px;
+}
+
+th,td{
+  text-align:left;
+  padding:14px 12px;
+  border-bottom:1px solid var(--border);
+  font-size:12px;
+}
+
+th{color:var(--lime)}
+td{color:var(--white)}
+
+tr:hover{background:var(--card2)}
+
+.missing{color:var(--orange)}
+.high{color:var(--blue)}
+.low{color:var(--orange)}
+
+.analysis{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+.analysis p{
+  color:var(--muted);
+  font-size:13px;
+  line-height:2;
+  margin-top:12px;
+}
+
+.formula{
+  background:var(--card2);
+  border-radius:10px;
+  padding:20px;
+  color:var(--muted);
+  font-size:14px;
+  line-height:2;
+}
+
+button{
+  background:var(--lime);
+  color:#142018;
+  border:0;
+  padding:13px 20px;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:20px;
+}
+
+button:hover{opacity:.85}
+
+footer{
+  border-top:1px solid var(--border);
+  margin-top:40px;
+  padding:25px 0;
+  color:var(--muted);
+  font-size:11px;
+  line-height:2;
+}
+
+@media(max-width:850px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .analysis{grid-template-columns:1fr}
+}
+
+@media(max-width:500px){
+  body{padding:22px 4%}
+  .value{font-size:27px}
+  .chartbox{height:350px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+  <div class="logo">CLIMATE / ANALYTICS</div>
+  <div class="date">IRAN · AUGUST 2024</div>
+</header>
+
+<section class="hero">
+
+  <small>SYNOPTIC WEATHER STATION / 408410</small>
+
+  <h1>KERMAN<br><span>HUMIDITY STUDY.</span></h1>
+
+  <p>
+    Daily average relative humidity analysis at
+    Kerman Synoptic Weather Station during August 2024.
+    This study investigates the daily variations in
+    atmospheric moisture over a one-month period.
+  </p>
+
+</section>
+
+<section class="grid">
+
+  <div class="card">
+    <div class="label">MONTHLY MEAN HUMIDITY</div>
+    <div class="value" id="mean">--</div>
+    <div class="unit">Relative Humidity (%)</div>
+  </div>
+
+  <div class="card">
+    <div class="label">MAXIMUM HUMIDITY</div>
+    <div class="value" id="maximum">--</div>
+    <div class="unit" id="maxDay">--</div>
+  </div>
+
+  <div class="card">
+    <div class="label">MINIMUM HUMIDITY</div>
+    <div class="value" id="minimum">--</div>
+    <div class="unit" id="minDay">--</div>
+  </div>
+
+  <div class="card">
+    <div class="label">VALID OBSERVATIONS</div>
+    <div class="value" id="count">--</div>
+    <div class="unit">Daily records</div>
+  </div>
+
+</section>
+
+<section class="card">
+
+  <h2>01 / Daily Humidity Variation</h2>
+
+  <p class="subtitle">
+    Daily average relative humidity versus time.
+    The dashed horizontal line indicates the monthly mean.
+  </p>
+
+  <div class="chartbox">
+    <canvas id="humidityChart"></canvas>
+  </div>
+
+  <div class="baseline">
+    <div class="baseline-line"></div>
+    Monthly mean baseline:
+    <strong id="baselineValue" style="color:var(--lime)">
+      -- %
+    </strong>
+  </div>
+
+  <button onclick="downloadCSV()">
+    Download Daily Data CSV
+  </button>
+
+</section>
+
+<section class="analysis">
+
+  <div class="card">
+    <h2>02 / Statistical Analysis</h2>
+    <p id="statistics"></p>
+  </div>
+
+  <div class="card">
+    <h2>03 / Trend Interpretation</h2>
+    <p id="interpretation"></p>
+  </div>
+
+</section>
+
+<section class="card">
+
+  <h2>04 / Mathematical Method</h2>
+
+  <p class="subtitle">
+    Calculation of the monthly mean daily relative humidity.
+  </p>
+
+  <div class="formula">
+
+    <strong style="color:var(--lime)">
+      Monthly Mean Relative Humidity
+    </strong>
+
+    <br>
+
+    RH(mean) = Σ RH(i) / n
+
+    <br><br>
+
+    Where:
+
+    <br>
+    RH(i) = Daily average relative humidity (%)
+
+    <br>
+    n = Number of valid daily observations
+
+    <br><br>
+
+    RH(mean) = 565 / 30
+
+    <br>
+
+    RH(mean) = <strong style="color:var(--lime)">
+      18.83 %
+    </strong>
+
+  </div>
+
+</section>
+
+<section class="card" style="overflow-x:auto">
+
+  <h2>05 / Daily Data Table</h2>
+
+  <p class="subtitle">
+    Kerman Synoptic Station — August 1–31, 2024.
+    Humidity values are expressed as percentages.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>DAY</th>
+        <th>DATE</th>
+        <th>RELATIVE HUMIDITY (%)</th>
+        <th>DEVIATION FROM MEAN</th>
+      </tr>
+    </thead>
+
+    <tbody id="tableBody"></tbody>
+
+  </table>
+
+</section>
+
+<section class="card">
+
+  <h2>06 / Conclusion</h2>
+
+  <p id="conclusion"
+     style="color:var(--muted);font-size:13px;line-height:2">
+  </p>
+
+</section>
+
+<footer>
+
+  <strong>EXPERIMENT / CLIMATE DATA ANALYSIS</strong>
+
+  <br>
+
+  Station: Kerman Synoptic Weather Station
+
+  <br>
+
+  Station Code: 408410 (OIKK)
+
+  <br>
+
+  Coordinates: 30.25° N, 56.96° E
+
+  <br>
+
+  Elevation: 1748 meters
+
+  <br>
+
+  Period: August 1–31, 2024
+
+  <br>
+
+  Source: Tutiempo / NOAA-attributed observations
+
+  <br>
+
+  https://en.tutiempo.net/climate/08-2024/ws-408410.html
+
+  <br><br>
+
+  Note: August 12 has no reported humidity observation
+  and is excluded from the monthly mean calculation.
+
+</footer>
+
+</div>
+
+<script>
+
+// DAILY MEAN RELATIVE HUMIDITY (%)
+// null = missing observation
+
+const humidity = [
+  18,17,18,18,15,19,13,12,
+  13,19,17,null,18,18,19,23,
+  23,29,25,19,33,27,17,16,
+  18,18,18,17,20,16,12
+];
+
+const days = humidity.map((_,i)=>i+1);
+
+const valid = humidity.filter(v=>v!==null);
+
+const sum = valid.reduce((a,b)=>a+b,0);
+
+const mean = sum/valid.length;
+
+const max = Math.max(...valid);
+
+const min = Math.min(...valid);
+
+const maxDay = humidity.indexOf(max)+1;
+
+const minDays = humidity
+  .map((v,i)=>v===min?i+1:null)
+  .filter(v=>v!==null);
+
+// SUMMARY
+
+document.getElementById("mean").textContent =
+  mean.toFixed(2)+"%";
+
+document.getElementById("maximum").textContent =
+  max+"%";
+
+document.getElementById("minimum").textContent =
+  min+"%";
+
+document.getElementById("count").textContent =
+  valid.length;
+
+document.getElementById("maxDay").textContent =
+  "August "+maxDay;
+
+document.getElementById("minDay").textContent =
+  "August "+minDays.join(" and ");
+
+document.getElementById("baselineValue").textContent =
+  mean.toFixed(2)+"%";
+
+// DEVIATIONS
+
+const deviations = humidity.map(v=>
+  v===null ? null : v-mean
+);
+
+// STATISTICS
+
+const above = deviations.filter(v=>v>0).length;
+
+const below = deviations.filter(v=>v<0).length;
+
+document.getElementById("statistics").textContent =
+  `The monthly mean daily relative humidity was
+  ${mean.toFixed(2)}%. The highest recorded humidity
+  was ${max}% on August ${maxDay}. The lowest humidity
+  was ${min}% on August ${minDays.join(" and ")}.
+  A total of ${valid.length} valid daily observations
+  were available.`;
+
+// INTERPRETATION
+
+document.getElementById("interpretation").textContent =
+  `${above} days had humidity values above the monthly
+  average, while ${below} days were below the average.
+  The graph shows a noticeable increase in humidity
+  during the middle and third week of August, followed
+  by lower values toward the end of the month.`;
+
+// CHART
+
+const ctx =
+  document.getElementById("humidityChart");
+
+new Chart(ctx,{
+
+  type:"line",
+
+  data:{
+    labels:days,
+
+    datasets:[
+
+      {
+        label:"Daily Mean Relative Humidity",
+        data:humidity,
+        borderColor:"#82B8D5",
+        backgroundColor:"rgba(130,184,213,.10)",
+        borderWidth:2.5,
+        pointRadius:4,
+        pointHoverRadius:7,
+        pointBackgroundColor:"#C8F169",
+        tension:.3,
+        spanGaps:false,
+        fill:true
+      },
+
+      {
+        label:"Monthly Mean Baseline",
+        data:days.map(()=>mean),
+        borderColor:"#C8F169",
+        borderWidth:2,
+        borderDash:[8,6],
+        pointRadius:0,
+        tension:0,
+        fill:false
+      }
+
+    ]
+  },
+
+  options:{
+
+    responsive:true,
+    maintainAspectRatio:false,
+
+    interaction:{
+      intersect:false,
+      mode:"index"
+    },
+
+    plugins:{
+
+      legend:{
+        position:"bottom",
+        labels:{
+          color:"#edf3e9",
+          usePointStyle:true,
+          padding:20
+        }
+      },
+
+      tooltip:{
+        backgroundColor:"#20372A",
+        titleColor:"#C8F169",
+        bodyColor:"#edf3e9",
+
+        callbacks:{
+          label:function(context){
+
+            if(context.raw===null)
+              return "No observation available";
+
+            return context.dataset.label+
+              ": "+context.raw.toFixed(2)+"%";
+          }
+        }
+      }
+
+    },
+
+    scales:{
+
+      x:{
+        title:{
+          display:true,
+          text:"Day of August 2024",
+          color:"#91a394"
+        },
+        ticks:{color:"#91a394"},
+        grid:{
+          color:"rgba(255,255,255,.05)"
+        }
+      },
+
+      y:{
+        min:0,
+        max:40,
+
+        title:{
+          display:true,
+          text:"Relative Humidity (%)",
+          color:"#91a394"
+        },
+
+        ticks:{
+          color:"#91a394",
+          stepSize:5
+        },
+
+        grid:{
+          color:"rgba(255,255,255,.08)"
+        }
+      }
+
+    }
+
+  }
+
+});
+
+// DAILY TABLE
+
+const tbody =
+  document.getElementById("tableBody");
+
+humidity.forEach((v,i)=>{
+
+  const tr=document.createElement("tr");
+
+  if(v===null){
+
+    tr.innerHTML=`
+      <td>${i+1}</td>
+      <td>August ${i+1}, 2024</td>
+      <td class="missing">No Data</td>
+      <td class="missing">Not calculated</td>
+    `;
+
+  }else{
+
+    const deviation=v-mean;
+
+    tr.innerHTML=`
+      <td>${i+1}</td>
+      <td>August ${i+1}, 2024</td>
+      <td>${v}%</td>
+      <td class="${deviation>=0?'high':'low'}">
+        ${deviation>0?'+':''}${deviation.toFixed(2)}%
+      </td>
+    `;
+
+  }
+
+  tbody.appendChild(tr);
+
+});
+
+// CONCLUSION
+
+document.getElementById("conclusion").textContent =
+  `The daily relative humidity data from Kerman Synoptic
+  Weather Station during August 2024 were analyzed.
+  Based on 30 valid observations, the monthly mean
+  relative humidity was ${mean.toFixed(2)}%.
+  The maximum value was ${max}% and the minimum
+  value was ${min}%. The daily humidity-time graph
+  demonstrates variations in atmospheric moisture
+  throughout the study period. August 12 was excluded
+  because no observation was available.`;
+
+// CSV EXPORT
+
+function downloadCSV(){
+
+  let csv =
+    "Day,Date,Relative Humidity (%),Monthly Mean (%),Deviation (%)\n";
+
+  humidity.forEach((v,i)=>{
+
+    const date =
+      `2024-08-${String(i+1).padStart(2,"0")}`;
+
+    const deviation =
+      v===null ? "" : (v-mean).toFixed(2);
+
+    csv += [
+      i+1,
+      date,
+      v===null?"":v,
+      mean.toFixed(2),
+      deviation
+    ].join(",")+"\n";
+
+  });
+
+  const blob = new Blob(
+    ["\uFEFF"+csv],
+    {type:"text/csv;charset=utf-8;"}
+  );
+
+  const link=document.createElement("a");
+
+  link.href=URL.createObjectURL(blob);
+
+  link.download=
+    "Kerman_August_2024_Humidity.csv";
+
+  link.click();
+
+  URL.revokeObjectURL(link.href);
+
+}
+
+</script>
+
+</body>
+</html>
