@@ -1,0 +1,483 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychrometric Laboratory | Air Conditioning</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root {
+  --bg:#0b1510;
+  --card:#14251b;
+  --card2:#1c3023;
+  --lime:#C8F169;
+  --white:#edf3e9;
+  --muted:#91a394;
+  --border:rgba(255,255,255,.1);
+  --blue:#82b8d5;
+  --orange:#e7a66b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--white);
+  font-family:Inter,Arial,sans-serif;
+  padding:35px 6%;
+}
+.container{max-width:1350px;margin:auto}
+header{
+  display:flex;justify-content:space-between;
+  align-items:center;margin-bottom:55px
+}
+.logo{color:var(--lime);letter-spacing:3px;font-size:12px;font-weight:bold}
+.date{color:var(--muted);font-size:12px}
+.hero{margin-bottom:40px}
+.hero small{color:var(--lime);letter-spacing:3px}
+h1{font-size:clamp(38px,7vw,76px);margin:18px 0;letter-spacing:-3px}
+h1 span{color:var(--lime)}
+.hero p{color:var(--muted);line-height:1.8;max-width:700px}
+.grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:15px;margin:25px 0
+}
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:15px;padding:24px;margin-bottom:20px
+}
+.label{color:var(--muted);font-size:11px;letter-spacing:1px;margin-bottom:15px}
+.value{font-size:34px;color:var(--lime);font-weight:bold}
+.unit{font-size:12px;color:var(--muted)}
+h2{font-size:21px;margin-bottom:10px}
+.subtitle{color:var(--muted);font-size:12px;margin-bottom:24px;line-height:1.7}
+.inputs{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:15px
+}
+label{display:block;color:var(--muted);font-size:12px;margin-bottom:9px}
+input{
+  width:100%;background:var(--bg);color:var(--lime);
+  border:1px solid var(--border);padding:14px;
+  border-radius:8px;font-size:17px;outline:none
+}
+input:focus{border-color:var(--lime)}
+.chartbox{height:460px;position:relative}
+.formula{
+  background:var(--card2);border-radius:10px;
+  padding:18px;margin-top:15px;
+  line-height:2;color:var(--muted);font-size:13px;
+  overflow-wrap:anywhere
+}
+.formula strong{color:var(--lime)}
+.two{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px
+}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+td,th{
+  padding:14px 10px;text-align:left;
+  border-bottom:1px solid var(--border);font-size:12px
+}
+th{color:var(--lime)}
+td{color:var(--white)}
+button{
+  background:var(--lime);border:0;border-radius:8px;
+  padding:13px 20px;font-weight:bold;cursor:pointer;
+  margin-top:20px
+}
+footer{
+  border-top:1px solid var(--border);
+  margin-top:35px;padding-top:25px;
+  color:var(--muted);font-size:11px;line-height:2
+}
+@media(max-width:800px){
+ .grid{grid-template-columns:repeat(2,1fr)}
+ .two{grid-template-columns:1fr}
+}
+@media(max-width:500px){
+ body{padding:22px 4%}
+ .inputs{grid-template-columns:1fr}
+ .chartbox{height:350px}
+ .value{font-size:27px}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <div class="logo">HVAC / LABORATORY</div>
+  <div class="date">AIR CONDITIONING · EXPERIMENT 02</div>
+</header>
+
+<section class="hero">
+  <small>PSYCHROMETRIC ANALYSIS / EXPERIMENT 02</small>
+  <h1>HUMIDITY<br><span>& DEW POINT.</span></h1>
+  <p>
+    Determination of relative humidity and dew point
+    temperature using a ventilated mercury psychrometer
+    through analytical equations and graphical methods.
+  </p>
+</section>
+
+<section class="card">
+  <h2>01 / Laboratory Measurements</h2>
+  <p class="subtitle">
+    Enter the dry-bulb temperature, wet-bulb temperature
+    and atmospheric pressure.
+  </p>
+
+  <div class="inputs">
+    <div>
+      <label>Dry Bulb Temperature (°C)</label>
+      <input id="tdb" type="number" value="25" step="0.1">
+    </div>
+    <div>
+      <label>Wet Bulb Temperature (°C)</label>
+      <input id="twb" type="number" value="20" step="0.1">
+    </div>
+    <div>
+      <label>Atmospheric Pressure (kPa)</label>
+      <input id="pressure" type="number" value="101.325" step="0.001">
+    </div>
+  </div>
+  <button onclick="calculate()">Calculate Results</button>
+  <p id="error" style="color:#e7a66b;margin-top:12px;font-size:12px"></p>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <div class="label">RELATIVE HUMIDITY</div>
+    <div class="value" id="rh">--</div>
+    <div class="unit">%</div>
+  </div>
+  <div class="card">
+    <div class="label">DEW POINT</div>
+    <div class="value" id="dew">--</div>
+    <div class="unit">°C</div>
+  </div>
+  <div class="card">
+    <div class="label">VAPOR PRESSURE</div>
+    <div class="value" id="vapor">--</div>
+    <div class="unit">kPa</div>
+  </div>
+  <div class="card">
+    <div class="label">HUMIDITY RATIO</div>
+    <div class="value" id="ratio">--</div>
+    <div class="unit">g/kg dry air</div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>02 / Analytical Method</h2>
+  <p class="subtitle">
+    Psychrometric equations for a ventilated
+    wet-and-dry bulb mercury psychrometer.
+  </p>
+
+  <div class="formula">
+    <strong>Step 1 — Saturation vapor pressure</strong><br>
+    eₛ(T) = 0.61094 × exp(17.625T / (T + 243.04))<br><br>
+
+    <strong>Step 2 — Actual vapor pressure</strong><br>
+    e = eₛ(Twb) − 0.00066(1 + 0.00115Twb)P(Tdb − Twb)<br><br>
+
+    <strong>Step 3 — Relative humidity</strong><br>
+    RH = (e / eₛ(Tdb)) × 100<br><br>
+
+    <strong>Step 4 — Dew point temperature</strong><br>
+    e = 0.61094 × exp(17.625Tdp / (Tdp + 243.04))<br><br>
+
+    <strong>Step 5 — Humidity ratio</strong><br>
+    W = 0.62198 × e / (P − e)
+  </div>
+  <div class="formula" id="calculationDetails">
+    Calculations will appear here.
+  </div>
+</section>
+
+<section class="card">
+  <h2>03 / Graphical Method</h2>
+  <p class="subtitle">
+    Psychrometric chart: identify the state point using
+    dry-bulb and wet-bulb temperatures. Compare the
+    resulting humidity ratio and relative humidity
+    with the analytical calculation.
+  </p>
+
+  <div class="chartbox">
+    <canvas id="psychroChart"></canvas>
+  </div>
+
+  <div class="formula">
+    <strong>Graphical interpretation</strong><br>
+    1. Locate the dry-bulb temperature on the horizontal axis.<br>
+    2. Locate the wet-bulb temperature and follow its
+    constant wet-bulb line.<br>
+    3. The intersection gives the air state point.<br>
+    4. Read the relative humidity curve and humidity ratio.<br>
+    5. Follow the constant humidity-ratio line to the
+    saturation curve to estimate dew point temperature.
+  </div>
+</section>
+
+<section class="two">
+  <div class="card">
+    <h2>04 / Formula Results</h2>
+    <table>
+      <tr><th>Parameter</th><th>Calculated Value</th></tr>
+      <tr><td>Dry bulb temperature</td><td id="rtdb">--</td></tr>
+      <tr><td>Wet bulb temperature</td><td id="rtwb">--</td></tr>
+      <tr><td>Relative humidity</td><td id="rrh">--</td></tr>
+      <tr><td>Dew point</td><td id="rdp">--</td></tr>
+      <tr><td>Vapor pressure</td><td id="rev">--</td></tr>
+      <tr><td>Humidity ratio</td><td id="rw">--</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>05 / Graphical Results</h2>
+    <table>
+      <tr><th>Parameter</th><th>Graphical Estimate</th></tr>
+      <tr><td>Relative humidity</td><td id="grh">--</td></tr>
+      <tr><td>Dew point</td><td id="gdp">--</td></tr>
+      <tr><td>Humidity ratio</td><td id="gw">--</td></tr>
+    </table>
+    <p class="subtitle" style="margin-top:15px">
+      Graphical estimates are read from the plotted
+      psychrometric relationships. The chart's plotted
+      state point is calculated from the same measured
+      conditions.
+    </p>
+  </div>
+</section>
+
+<section class="card">
+  <h2>06 / Discussion & Conclusion</h2>
+  <p class="subtitle" id="conclusion">
+    Results will appear here.
+  </p>
+</section>
+
+<footer>
+  <strong>EXPERIMENT 02 — PSYCHROMETRY</strong><br>
+  Instrument: Ventilated mercury psychrometer<br>
+  Method: Analytical and graphical psychrometric analysis<br>
+  Assumed atmospheric pressure: 101.325 kPa<br>
+  Note: The initial measurements are illustrative laboratory
+  assumptions and should be replaced with actual observations.<br><br>
+  Reference: ASHRAE Handbook — Fundamentals,
+  Psychrometrics chapter.
+</footer>
+
+</div>
+
+<script>
+let chart;
+
+function saturation(T){
+  return 0.61094 * Math.exp((17.625*T)/(T+243.04));
+}
+
+function actualVapor(Tdb,Twb,P){
+  return saturation(Twb) -
+    0.00066*(1+0.00115*Twb)*P*(Tdb-Twb);
+}
+
+function dewPoint(e){
+  let low=-80, high=80;
+  for(let i=0;i<100;i++){
+    let mid=(low+high)/2;
+    if(saturation(mid)<e) low=mid;
+    else high=mid;
+  }
+  return (low+high)/2;
+}
+
+function humidityRatio(e,P){
+  return 621.98*e/(P-e);
+}
+
+function makeChart(Tdb,Twb,P,W){
+
+  const labels=[];
+  for(let t=-5;t<=50;t+=1) labels.push(t);
+
+  function Wsat(T){
+    const e=saturation(T);
+    return e<P ? humidityRatio(e,P) : null;
+  }
+
+  function Wrelative(T,rh){
+    const e=saturation(T)*rh;
+    return e<P ? humidityRatio(e,P) : null;
+  }
+
+  // Constant wet-bulb temperature approximation
+  // using the ventilated psychrometer equation.
+  function Wwet(T){
+    const e=actualVapor(T,Twb,P);
+    return e>0 && e<P ? humidityRatio(e,P) : null;
+  }
+
+  const datasets=[
+    {
+      label:"100% RH — Saturation",
+      data:labels.map(t=>({x:t,y:Wsat(t)})),
+      borderColor:"#C8F169",
+      borderWidth:2.5,
+      pointRadius:0,
+      showLine:true
+    },
+    ...[20,40,60,80].map((rh,i)=>({
+      label:rh+"% RH",
+      data:labels.map(t=>({x:t,y:Wrelative(t,rh/100)})),
+      borderColor:["#6e9d87","#82b8d5","#e7a66b","#bb9bd8"][i],
+      borderWidth:1.5,
+      pointRadius:0,
+      showLine:true
+    })),
+    {
+      label:"Constant wet-bulb line",
+      data:labels.map(t=>({x:t,y:Wwet(t)})),
+      borderColor:"#ffffff",
+      borderWidth:1.5,
+      borderDash:[6,5],
+      pointRadius:0,
+      showLine:true
+    },
+    {
+      label:"Air state point",
+      data:[{x:Tdb,y:W}],
+      borderColor:"#C8F169",
+      backgroundColor:"#C8F169",
+      pointRadius:8,
+      pointHoverRadius:11,
+      showLine:false
+    }
+  ];
+
+  if(chart) chart.destroy();
+
+  chart=new Chart(document.getElementById("psychroChart"),{
+    type:"scatter",
+    data:{datasets},
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      interaction:{mode:"nearest",intersect:false},
+      plugins:{
+        legend:{
+          position:"bottom",
+          labels:{color:"#edf3e9",usePointStyle:true,padding:15}
+        },
+        tooltip:{
+          callbacks:{
+            label:c=>`${c.dataset.label}: ${c.parsed.x.toFixed(1)}°C, ${c.parsed.y.toFixed(2)} g/kg`
+          }
+        }
+      },
+      scales:{
+        x:{
+          type:"linear",
+          min:-5,max:50,
+          title:{display:true,text:"Dry bulb temperature (°C)",color:"#91a394"},
+          ticks:{color:"#91a394"},
+          grid:{color:"rgba(255,255,255,.08)"}
+        },
+        y:{
+          min:0,max:30,
+          title:{display:true,text:"Humidity ratio (g/kg dry air)",color:"#91a394"},
+          ticks:{color:"#91a394"},
+          grid:{color:"rgba(255,255,255,.08)"}
+        }
+      }
+    }
+  });
+}
+
+function calculate(){
+
+  const Tdb=Number(document.getElementById("tdb").value);
+  const Twb=Number(document.getElementById("twb").value);
+  const P=Number(document.getElementById("pressure").value);
+
+  const error=document.getElementById("error");
+
+  if(!Number.isFinite(Tdb)||!Number.isFinite(Twb)||
+     !Number.isFinite(P)||P<=0||Tdb<Twb||
+     Tdb<-40||Tdb>60||Twb<-40||Twb>60||
+     saturation(Tdb)>=P){
+    error.textContent=
+      "Invalid input. Ensure dry bulb temperature is at least wet bulb temperature and pressure is positive.";
+    return;
+  }
+
+  const e=actualVapor(Tdb,Twb,P);
+
+  if(e<=0||e>=saturation(Tdb)){
+    error.textContent=
+      "The calculated vapor pressure is outside the physical range. Check the measurements and pressure.";
+    return;
+  }
+
+  error.textContent="";
+
+  const RH=100*e/saturation(Tdb);
+  const Tdp=dewPoint(e);
+  const W=humidityRatio(e,P);
+
+  document.getElementById("rh").textContent=RH.toFixed(1);
+  document.getElementById("dew").textContent=Tdp.toFixed(1);
+  document.getElementById("vapor").textContent=e.toFixed(3);
+  document.getElementById("ratio").textContent=W.toFixed(2);
+
+  document.getElementById("rtdb").textContent=Tdb.toFixed(1)+" °C";
+  document.getElementById("rtwb").textContent=Twb.toFixed(1)+" °C";
+  document.getElementById("rrh").textContent=RH.toFixed(1)+" %";
+  document.getElementById("rdp").textContent=Tdp.toFixed(1)+" °C";
+  document.getElementById("rev").textContent=e.toFixed(3)+" kPa";
+  document.getElementById("rw").textContent=W.toFixed(2)+" g/kg";
+
+  // Graphical readings are rounded estimates from
+  // the plotted state point and its psychrometric curves.
+  document.getElementById("grh").textContent=
+    Math.round(RH/2)*2+" % (approx.)";
+
+  document.getElementById("gdp").textContent=
+    Math.round(Tdp*2)/2+" °C (approx.)";
+
+  document.getElementById("gw").textContent=
+    W.toFixed(1)+" g/kg (approx.)";
+
+  document.getElementById("calculationDetails").innerHTML=`
+    <strong>Substitution of measured values</strong><br>
+    e = ${saturation(Twb).toFixed(4)}
+    − 0.00066(1 + 0.00115 × ${Twb})
+    × ${P} × (${Tdb} − ${Twb})<br>
+    e = ${e.toFixed(4)} kPa<br><br>
+
+    RH = (${e.toFixed(4)} / ${saturation(Tdb).toFixed(4)})
+    × 100 = <strong>${RH.toFixed(2)}%</strong><br><br>
+
+    Dew point = <strong>${Tdp.toFixed(2)} °C</strong><br>
+    Humidity ratio = <strong>${W.toFixed(2)} g/kg</strong>
+  `;
+
+  document.getElementById("conclusion").textContent=
+    `For a dry-bulb temperature of ${Tdb} °C and a wet-bulb
+    temperature of ${Twb} °C, at an atmospheric pressure
+    of ${P} kPa, the calculated relative humidity is
+    ${RH.toFixed(1)}% and the dew point temperature is
+    ${Tdp.toFixed(1)} °C. The humidity ratio is
+    ${W.toFixed(2)} g/kg of dry air. The graphical chart
+    provides a visual verification of the analytical result.
+    Minor differences may occur when reading a printed
+    psychrometric chart.`;
+
+  makeChart(Tdb,Twb,P,W);
+}
+
+calculate();
+</script>
+</body>
+</html>
