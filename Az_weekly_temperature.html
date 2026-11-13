@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <title>Kerman Weekly Temperature Report | Mohammadreza Heydari</title>
+  <style>
+    :root {
+      --bg: #07110d;
+      --bg-soft: #0a1711;
+      --panel: #10221a;
+      --panel-2: #13291f;
+      --line: rgba(206, 231, 210, .10);
+      --line-strong: rgba(206, 231, 210, .17);
+      --text: #f1f5eb;
+      --muted: #9caf9f;
+      --dim: #6f8475;
+      --lime: #c8f169;
+      --mint: #75d9b0;
+      --orange: #f4bf79;
+      --radius: 22px;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .18);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 86% -10%, rgba(104, 151, 83, .14), transparent 36%),
+        radial-gradient(ellipse at -15% 40%, rgba(42, 102, 76, .10), transparent 33%),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-feature-settings: "ss01" on, "cv11" on;
+      line-height: 1.5;
+    }
+    button, a { font: inherit; }
+    a { color: var(--lime); text-decoration-color: rgba(200, 241, 105, .38); text-underline-offset: 3px; }
+    a:hover { text-decoration-color: var(--lime); }
+    .shell { width: min(1440px, calc(100% - 56px)); margin: 0 auto; padding: 35px 0 32px; }
+    .topline { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding-bottom: 26px; border-bottom: 1px solid var(--line); }
+    .identity { display: flex; align-items: center; gap: 13px; min-width: 0; }
+    .monogram { width: 43px; height: 43px; display: grid; place-items: center; border: 1px solid rgba(200,241,105,.3); border-radius: 14px; background: rgba(200,241,105,.07); color: var(--lime); font-size: 13px; font-weight: 800; letter-spacing: .06em; flex: 0 0 auto; }
+    .eyebrow { text-transform: uppercase; letter-spacing: .16em; font-weight: 700; font-size: 10px; color: var(--muted); }
+    .author { font-size: 14px; font-weight: 650; letter-spacing: -.015em; margin-top: 2px; }
+    .top-actions { display: flex; align-items: center; gap: 12px; }
+    .live-tag { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line-strong); border-radius: 999px; padding: 8px 12px; color: var(--muted); font-size: 11px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 12px rgba(200,241,105,.55); }
+    .print-btn { display: inline-flex; align-items: center; gap: 9px; border: 1px solid rgba(200,241,105,.27); background: var(--lime); color: #182313; padding: 10px 14px; border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; transition: transform .2s ease, filter .2s ease; white-space: nowrap; }
+    .print-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    .print-btn svg { width: 15px; height: 15px; }
+    .hero { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; padding: 46px 0 31px; }
+    .hero-copy { max-width: 750px; }
+    .section-tag { color: var(--lime); text-transform: uppercase; letter-spacing: .19em; font-size: 10px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+    .section-tag::before { content: ""; display: inline-block; width: 24px; height: 1px; background: var(--lime); }
+    h1 { font-size: clamp(37px, 5.5vw, 69px); line-height: .99; letter-spacing: -.065em; font-weight: 650; margin: 17px 0 17px; }
+    h1 .accent { color: var(--lime); }
+    .hero-description { color: var(--muted); font-size: 14px; max-width: 600px; margin: 0; line-height: 1.8; }
+    .period { min-width: 215px; padding: 17px 19px 16px; background: rgba(16,34,26,.68); border: 1px solid var(--line); border-radius: 17px; }
+    .period-label { color: var(--dim); text-transform: uppercase; letter-spacing: .14em; font-size: 9px; font-weight: 800; }
+    .period-date { margin-top: 7px; font-size: 16px; font-weight: 720; letter-spacing: -.025em; }
+    .period-note { color: var(--muted); font-size: 11px; margin-top: 4px; }
+    .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 15px; }
+    .metric { position: relative; overflow: hidden; min-height: 145px; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(145deg, rgba(19,41,31,.98), rgba(13,29,22,.92)); padding: 21px 22px; box-shadow: var(--shadow); }
+    .metric::after { content: ""; position: absolute; width: 100px; height: 100px; border-radius: 50%; right: -41px; bottom: -57px; border: 1px solid rgba(200,241,105,.11); box-shadow: 0 0 0 12px rgba(200,241,105,.018), 0 0 0 25px rgba(200,241,105,.015); pointer-events: none; }
+    .metric-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; color: var(--muted); font-size: 11px; font-weight: 600; }
+    .metric-icon { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; background: rgba(200,241,105,.09); color: var(--lime); }
+    .metric-icon svg { width: 17px; height: 17px; }
+    .metric-value { font-size: clamp(30px, 3vw, 41px); line-height: 1; letter-spacing: -.065em; font-weight: 650; margin-top: 19px; }
+    .metric-value span { font-size: 16px; color: var(--muted); letter-spacing: -.02em; margin-left: 3px; font-weight: 500; }
+    .metric-foot { color: var(--dim); font-size: 10px; margin-top: 10px; }
+    .content-grid { display: grid; grid-template-columns: minmax(0, 1.72fr) minmax(280px, .78fr); gap: 15px; align-items: stretch; }
+    .panel { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(13,30,22,.91); box-shadow: var(--shadow); min-width: 0; }
+    .panel-head { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; padding: 23px 24px 0; }
+    .panel-kicker { color: var(--dim); font-size: 9px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    h2 { font-size: 19px; letter-spacing: -.035em; margin: 5px 0 0; line-height: 1.3; font-weight: 650; }
+    .legend { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 15px; padding-top: 7px; color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .legend-item { display: inline-flex; align-items: center; gap: 7px; }
+    .legend-line { width: 17px; height: 3px; border-radius: 4px; background: var(--lime); }
+    .legend-line.low { background: var(--mint); }
+    .chart-wrap { padding: 10px 15px 8px 7px; }
+    #temperature-chart { display: block; width: 100%; height: auto; overflow: visible; }
+    .chart-caption { display: flex; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid var(--line); margin: 0 22px; padding: 14px 0 17px; color: var(--dim); font-size: 10px; }
+    .chart-caption strong { color: var(--muted); font-weight: 600; }
+    .insights { display: flex; flex-direction: column; }
+    .insight-content { padding: 21px 23px 22px; display: flex; flex-direction: column; flex: 1; }
+    .insight-highlight { border-radius: 16px; padding: 17px 17px 18px; background: linear-gradient(135deg, rgba(200,241,105,.12), rgba(200,241,105,.035)); border: 1px solid rgba(200,241,105,.17); }
+    .insight-highlight .small-label { display: flex; align-items: center; gap: 7px; color: var(--lime); text-transform: uppercase; letter-spacing: .12em; font-weight: 800; font-size: 9px; }
+    .insight-highlight .small-label svg { width: 14px; height: 14px; }
+    .insight-number { font-size: 34px; font-weight: 650; letter-spacing: -.06em; line-height: 1; margin-top: 13px; }
+    .insight-number small { font-size: 14px; color: var(--muted); font-weight: 500; letter-spacing: 0; }
+    .insight-highlight p { color: #bdcbbb; font-size: 11px; line-height: 1.65; margin: 9px 0 0; }
+    .insight-list { margin-top: 21px; }
+    .insight-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+    .insight-row:last-child { border-bottom: 0; }
+    .insight-label { color: var(--muted); font-size: 11px; }
+    .insight-value { font-size: 12px; font-weight: 750; text-align: right; }
+    .insight-value em { color: var(--dim); font-style: normal; font-size: 10px; font-weight: 500; display: block; margin-top: 2px; }
+    .observation { margin-top: auto; padding: 14px 15px; border-left: 2px solid var(--lime); background: rgba(200,241,105,.045); color: var(--muted); font-size: 11px; line-height: 1.7; border-radius: 0 10px 10px 0; }
+    .table-panel { margin-top: 15px; overflow: hidden; }
+    .table-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; padding: 23px 24px 18px; }
+    .table-head p { margin: 6px 0 0; color: var(--muted); font-size: 11px; }
+    .unit-pill { color: var(--lime); border: 1px solid rgba(200,241,105,.22); background: rgba(200,241,105,.06); border-radius: 999px; padding: 6px 10px; font-size: 10px; font-weight: 750; white-space: nowrap; }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; min-width: 600px; }
+    thead { background: rgba(255,255,255,.018); }
+    th { font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: .14em; font-weight: 800; padding: 12px 24px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    td { padding: 13px 24px; font-size: 12px; border-bottom: 1px solid var(--line); color: var(--muted); }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: rgba(200,241,105,.035); }
+    .date-cell { color: var(--text); font-weight: 650; }
+    .date-cell small { display: block; color: var(--dim); font-weight: 500; font-size: 10px; margin-top: 2px; }
+    .value-high { color: var(--lime); font-weight: 750; }
+    .value-low { color: var(--mint); font-weight: 750; }
+    .range-track { height: 5px; width: 100%; min-width: 100px; background: rgba(255,255,255,.06); border-radius: 99px; position: relative; overflow: hidden; }
+    .range-fill { position: absolute; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--mint), var(--lime)); }
+    .footer { padding-top: 25px; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; color: var(--dim); font-size: 10px; line-height: 1.8; }
+    .footer p { max-width: 850px; margin: 0; }
+    .footer .foot-title { color: var(--muted); font-weight: 750; display: block; margin-bottom: 4px; }
+    .footer-mark { text-transform: uppercase; letter-spacing: .14em; text-align: right; white-space: nowrap; font-weight: 800; }
+    .footer-mark span { display: block; color: var(--muted); letter-spacing: .04em; text-transform: none; font-weight: 500; margin-top: 4px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @media (max-width: 1000px) {
+      .shell { width: min(100% - 36px, 850px); }
+      .content-grid { grid-template-columns: 1fr; }
+      .insights { min-height: auto; }
+      .insight-content { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1fr); gap: 20px; }
+      .insight-list { margin-top: 0; }
+      .observation { grid-column: 1 / -1; }
+      .hero { align-items: flex-start; flex-direction: column; }
+      .period { width: 100%; }
+    }
+    @media (max-width: 650px) {
+      .shell { width: calc(100% - 28px); padding-top: 19px; }
+      .topline { align-items: flex-start; padding-bottom: 19px; }
+      .top-actions { flex-direction: column-reverse; align-items: flex-end; gap: 8px; }
+      .live-tag { font-size: 9px; padding: 7px 9px; }
+      .print-btn { padding: 9px 10px; }
+      .hero { padding: 35px 0 23px; gap: 22px; }
+      h1 { font-size: clamp(36px, 11vw, 54px); }
+      .hero-description { font-size: 12px; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .metric { min-height: 132px; padding: 16px; border-radius: 17px; }
+      .metric-value { margin-top: 16px; font-size: 34px; }
+      .panel { border-radius: 17px; }
+      .panel-head { flex-direction: column; padding: 20px 18px 0; gap: 8px; }
+      .legend { justify-content: flex-start; padding-top: 5px; }
+      .chart-wrap { padding: 9px 4px 5px; }
+      .chart-caption { margin: 0 17px; align-items: flex-start; flex-direction: column; gap: 3px; }
+      .insight-content { display: flex; padding: 18px; }
+      .insight-list { margin-top: 17px; }
+      .observation { margin-top: 15px; }
+      .table-head { padding: 19px 18px 15px; }
+      th, td { padding-left: 18px; padding-right: 18px; }
+      .footer { flex-direction: column; gap: 12px; }
+      .footer-mark { text-align: left; }
+    }
+    @media print {
+      :root { --bg: #ffffff; --text: #14231a; --muted: #45574b; --dim: #65756a; --panel: #f5f8f3; --panel-2: #edf3e8; --line: rgba(20,35,26,.15); --line-strong: rgba(20,35,26,.24); }
+      body { background: #fff; color: #14231a; }
+      .shell { width: 100%; padding: 0; }
+      .print-btn { display: none; }
+      .panel, .metric { box-shadow: none; break-inside: avoid; }
+      .panel { background: #f7faf5; }
+      .metric { background: #f1f6ed; }
+      .insight-highlight { background: #edf5df; }
+      .observation { background: #f3f8e9; }
+      a { color: #395b18; }
+      .topline, .table-panel, .content-grid, .metrics { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topline">
+      <div class="identity">
+        <div class="monogram" aria-hidden="true">MH</div>
+        <div>
+          <div class="eyebrow">Prepared by</div>
+          <div class="author">Mohammadreza Heydari</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="live-tag"><span class="live-dot" aria-hidden="true"></span> Weekly observation</div>
+        <button class="print-btn" type="button" onclick="window.print()" aria-label="Print or save this report as PDF">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/><path d="M18 12h.01"/></svg>
+          Print report
+        </button>
+      </div>
+    </header>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <div class="section-tag">Weather data study / 01</div>
+        <h1 id="page-title">Kerman <span class="accent">in degrees.</span></h1>
+        <p class="hero-description">A seven-day look at daily maximum and minimum air temperatures recorded at the Kerman weather station. Compare daytime highs with overnight lows and follow the week's temperature trend.</p>
+      </div>
+      <div class="period" aria-label="Observation period October 17 to October 23, 2026">
+        <div class="period-label">Observation period</div>
+        <div class="period-date">17 — 23 October 2026</div>
+        <div class="period-note">7 days · Temperature in Celsius</div>
+      </div>
+    </section>
+
+    <section class="metrics" aria-label="Weekly temperature summary">
+      <article class="metric">
+        <div class="metric-top"><span>Average daily high</span><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></span></div>
+        <div class="metric-value" id="avg-high">27.2<span>°C</span></div>
+        <div class="metric-foot">Mean of the seven daily maxima</div>
+      </article>
+      <article class="metric">
+        <div class="metric-top"><span>Average daily low</span><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V5a3 3 0 0 0-6 0v9.76a5 5 0 1 0 6 0Z"/><path d="M11 11v7"/></svg></span></div>
+        <div class="metric-value" id="avg-low">8.4<span>°C</span></div>
+        <div class="metric-foot">Mean of the seven daily minima</div>
+      </article>
+      <article class="metric">
+        <div class="metric-top"><span>Highest temperature</span><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5m-6 6 6-6 6 6"/><path d="M4 21h16"/></svg></span></div>
+        <div class="metric-value" id="max-high">28.6<span>°C</span></div>
+        <div class="metric-foot" id="max-high-date">Saturday, 17 October</div>
+      </article>
+      <article class="metric">
+        <div class="metric-top"><span>Lowest temperature</span><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m-6-6 6 6 6-6"/><path d="M4 3h16"/></svg></span></div>
+        <div class="metric-value" id="min-low">6.8<span>°C</span></div>
+        <div class="metric-foot" id="min-low-date">Thursday, 22 October</div>
+      </article>
+    </section>
+
+    <section class="content-grid" aria-label="Temperature chart and weekly insights">
+      <article class="panel chart-panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-kicker">Temperature overview</div>
+            <h2>Maximum vs. minimum</h2>
+          </div>
+          <div class="legend" aria-label="Chart legend">
+            <span class="legend-item"><span class="legend-line"></span> Daily maximum</span>
+            <span class="legend-item"><span class="legend-line low"></span> Daily minimum</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <svg id="temperature-chart" viewBox="0 0 1000 430" role="img" aria-label="Line chart of daily maximum and minimum temperatures in Kerman from October 17 through October 23, 2026."></svg>
+        </div>
+        <div class="chart-caption"><span>Daily observed air temperature</span><strong>Station report · °C</strong></div>
+      </article>
+
+      <aside class="panel insights" aria-labelledby="insights-title">
+        <div class="panel-head">
+          <div>
+            <div class="panel-kicker">At a glance</div>
+            <h2 id="insights-title">What changed this week</h2>
+          </div>
+        </div>
+        <div class="insight-content">
+          <div class="insight-highlight">
+            <div class="small-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-9"/><path d="M15 6h6v6"/></svg> Warmest daytime high</div>
+            <div class="insight-number">28.6<small> °C</small></div>
+            <p>Recorded on Saturday, October 17. The daily high then trended down overall through the end of the selected period.</p>
+          </div>
+          <div class="insight-list">
+            <div class="insight-row"><span class="insight-label">Coldest overnight low</span><span class="insight-value">6.8 °C<em>Thursday, Oct 22</em></span></div>
+            <div class="insight-row"><span class="insight-label">High-temperature change</span><span class="insight-value">−2.8 °C<em>First day to last day</em></span></div>
+            <div class="insight-row"><span class="insight-label">Largest daily range</span><span class="insight-value">20.1 °C<em>Monday, Oct 19</em></span></div>
+          </div>
+          <div class="observation"><strong style="color:var(--text);font-weight:700">Reading the trend.</strong> Daytime highs eased during the week, while minimum temperatures ranged from 6.8 °C to 10.0 °C.</div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="panel table-panel" aria-labelledby="data-table-title">
+      <div class="table-head">
+        <div>
+          <div class="panel-kicker">Daily observations</div>
+          <h2 id="data-table-title">The week's data</h2>
+          <p>Maximum and minimum temperatures by reporting date.</p>
+        </div>
+        <div class="unit-pill">UNIT / °C</div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <caption class="sr-only">Daily maximum and minimum temperatures at Kerman station from October 17 to October 23, 2026.</caption>
+          <thead><tr><th scope="col">Date</th><th scope="col">Max temperature</th><th scope="col">Min temperature</th><th scope="col">Daily range</th><th scope="col">Temperature span</th></tr></thead>
+          <tbody id="daily-table-body">
+            <tr><td class="date-cell">17 Oct 2026<small>Saturday</small></td><td class="value-high">28.6 °C</td><td class="value-low">9.5 °C</td><td>19.1 °C</td><td><div class="range-track"><span class="range-fill" style="left:20%;width:76.4%"></span></div></td></tr>
+            <tr><td class="date-cell">18 Oct 2026<small>Sunday</small></td><td class="value-high">28.2 °C</td><td class="value-low">9.0 °C</td><td>19.2 °C</td><td><div class="range-track"><span class="range-fill" style="left:20%;width:76.8%"></span></div></td></tr>
+            <tr><td class="date-cell">19 Oct 2026<small>Monday</small></td><td class="value-high">27.7 °C</td><td class="value-low">7.6 °C</td><td>20.1 °C</td><td><div class="range-track"><span class="range-fill" style="left:20%;width:80.4%"></span></div></td></tr>
+            <tr><td class="date-cell">20 Oct 2026<small>Tuesday</small></td><td class="value-high">27.0 °C</td><td class="value-low">8.0 °C</td><td>19.0 °C</td><td><div class="range-track"><span class="range-fill" style="left:20%;width:76%"></span></div></td></tr>
+            <tr><td class="date-cell">21 Oct 2026<small>Wednesday</small></td><td class="value-high">26.1 °C</td><td class="value-low">8.2 °C</td><td>17.9 °C</td><td><div class="range-track"><span class="range-fill" style="left:20%;width:71.6%"></span></div></td></tr>
+            <tr><td class="date-cell">22 Oct 2026<small>Thursday</small></td><td class="value-high">26.8 °C</td><td class="value-low">6.8 °C</td><td>20.0 °C</td><td><div class="range-track"><span class="range-fill" style="left:20%;width:80%"></span></div></td></tr>
+            <tr><td class="date-cell">23 Oct 2026<small>Friday</small></td><td class="value-high">25.8 °C</td><td class="value-low">10.0 °C</td><td>15.8 °C</td><td><div class="range-track"><span class="range-fill" style="left:20%;width:63.2%"></span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p><span class="foot-title">Data source & methodology</span>Daily minimum, average, and maximum air temperatures for Kerman, Iran, station 40841. The source identifies the station at approximately 30.2500° N, 56.9667° E and 1,754 m elevation. The latest complete seven-day set available in the checked source was October 17–23, 2026; October 24–25 did not have daily entries in that table at the time of retrieval. <a href="https://www.weatherandclimate.eu/monitor/40841" target="_blank" rel="noopener noreferrer">View the Kerman station data</a>.</p>
+      <div class="footer-mark">Weather study<span>Mohammadreza Heydari · 2026</span></div>
+    </footer>
+  </main>
+
+  <script>
+    // Daily observations sourced from the Kerman station's October 2026 monitor table.
+    const observations = [
+      { date: '2026-10-17', day: 'Saturday', shortDay: 'SAT', dayNum: '17', high: 28.6, low: 9.5 },
+      { date: '2026-10-18', day: 'Sunday', shortDay: 'SUN', dayNum: '18', high: 28.2, low: 9.0 },
+      { date: '2026-10-19', day: 'Monday', shortDay: 'MON', dayNum: '19', high: 27.7, low: 7.6 },
+      { date: '2026-10-20', day: 'Tuesday', shortDay: 'TUE', dayNum: '20', high: 27.0, low: 8.0 },
+      { date: '2026-10-21', day: 'Wednesday', shortDay: 'WED', dayNum: '21', high: 26.1, low: 8.2 },
+      { date: '2026-10-22', day: 'Thursday', shortDay: 'THU', dayNum: '22', high: 26.8, low: 6.8 },
+      { date: '2026-10-23', day: 'Friday', shortDay: 'FRI', dayNum: '23', high: 25.8, low: 10.0 }
+    ];
+
+    const average = key => observations.reduce((sum, item) => sum + item[key], 0) / observations.length;
+    const hottest = observations.reduce((best, item) => item.high > best.high ? item : best, observations[0]);
+    const coldest = observations.reduce((best, item) => item.low < best.low ? item : best, observations[0]);
+    const largestRange = observations.reduce((best, item) => (item.high - item.low) > (best.high - best.low) ? item : best, observations[0]);
+    const fmt = value => Number(value).toFixed(1);
+
+    document.getElementById('avg-high').innerHTML = `${fmt(average('high'))}<span>°C</span>`;
+    document.getElementById('avg-low').innerHTML = `${fmt(average('low'))}<span>°C</span>`;
+    document.getElementById('max-high').innerHTML = `${fmt(hottest.high)}<span>°C</span>`;
+    document.getElementById('max-high-date').textContent = `${hottest.day}, ${hottest.dayNum} October`;
+    document.getElementById('min-low').innerHTML = `${fmt(coldest.low)}<span>°C</span>`;
+    document.getElementById('min-low-date').textContent = `${coldest.day}, ${coldest.dayNum} October`;
+    document.querySelector('.insight-number').innerHTML = `${fmt(hottest.high)}<small> °C</small>`;
+    document.querySelector('.insight-highlight p').textContent = `Recorded on ${hottest.day}, October ${hottest.dayNum}. The daily high then trended down overall through the end of the selected period.`;
+    document.querySelectorAll('.insight-row .insight-value')[0].innerHTML = `${fmt(coldest.low)} °C<em>${coldest.day}, Oct ${coldest.dayNum}</em>`;
+    const delta = observations[observations.length - 1].high - observations[0].high;
+    document.querySelectorAll('.insight-row .insight-value')[1].innerHTML = `${delta < 0 ? '−' : '+'}${fmt(Math.abs(delta))} °C<em>First day to last day</em>`;
+    document.querySelectorAll('.insight-row .insight-value')[2].innerHTML = `${fmt(largestRange.high - largestRange.low)} °C<em>${largestRange.day}, Oct ${largestRange.dayNum}</em>`;
+
+    // Draw a responsive SVG line chart without external libraries.
+    (function drawChart() {
+      const svg = document.getElementById('temperature-chart');
+      const ns = 'http://www.w3.org/2000/svg';
+      const W = 1000, H = 430;
+      const left = 70, right = 35, top = 45, bottom = 320;
+      const plotWidth = W - left - right;
+      const plotHeight = bottom - top;
+      const minAxis = 5, maxAxis = 30;
+      const x = i => left + (plotWidth / (observations.length - 1)) * i;
+      const y = value => top + ((maxAxis - value) / (maxAxis - minAxis)) * plotHeight;
+      const make = (tag, attrs = {}, textValue = null) => {
+        const el = document.createElementNS(ns, tag);
+        Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+        if (textValue !== null) el.textContent = textValue;
+        return el;
+      };
+      const append = (tag, attrs, textValue) => {
+        const el = make(tag, attrs, textValue); svg.appendChild(el); return el;
+      };
+      svg.innerHTML = '';
+      const defs = make('defs');
+      const highGradient = make('linearGradient', { id: 'highFill', x1: '0', y1: '0', x2: '0', y2: '1' });
+      highGradient.appendChild(make('stop', { offset: '0%', 'stop-color': '#c8f169', 'stop-opacity': '.19' }));
+      highGradient.appendChild(make('stop', { offset: '100%', 'stop-color': '#c8f169', 'stop-opacity': '0' }));
+      defs.appendChild(highGradient);
+      const lowGradient = make('linearGradient', { id: 'lowFill', x1: '0', y1: '0', x2: '0', y2: '1' });
+      lowGradient.appendChild(make('stop', { offset: '0%', 'stop-color': '#75d9b0', 'stop-opacity': '.12' }));
+      lowGradient.appendChild(make('stop', { offset: '100%', 'stop-color': '#75d9b0', 'stop-opacity': '0' }));
+      defs.appendChild(lowGradient); svg.appendChild(defs);
+
+      [5, 10, 15, 20, 25, 30].forEach(value => {
+        const yy = y(value);
+        append('line', { x1: left, x2: W - right, y1: yy, y2: yy, stroke: '#d4e5d6', 'stroke-opacity': '.10', 'stroke-dasharray': value === 5 ? '0' : '3 7' });
+        append('text', { x: left - 18, y: yy + 4, fill: '#718779', 'font-size': '12', 'text-anchor': 'end', 'font-family': 'inherit' }, `${value}°`);
+      });
+      append('text', { x: left, y: 20, fill: '#718779', 'font-size': '10', 'font-weight': '700', 'letter-spacing': '1.5', 'font-family': 'inherit' }, 'TEMPERATURE');
+
+      observations.forEach((item, i) => {
+        const xx = x(i);
+        append('line', { x1: xx, x2: xx, y1: top, y2: bottom, stroke: '#d4e5d6', 'stroke-opacity': '.045' });
+      });
+      const highPoints = observations.map((d, i) => `${x(i)},${y(d.high)}`).join(' ');
+      const lowPoints = observations.map((d, i) => `${x(i)},${y(d.low)}`).join(' ');
+      const highArea = `${x(0)},${bottom} ${highPoints} ${x(observations.length - 1)},${bottom}`;
+      const lowArea = `${x(0)},${bottom} ${lowPoints} ${x(observations.length - 1)},${bottom}`;
+      append('polygon', { points: highArea, fill: 'url(#highFill)' });
+      append('polygon', { points: lowArea, fill: 'url(#lowFill)' });
+      append('polyline', { points: highPoints, fill: 'none', stroke: '#c8f169', 'stroke-width': '3.5', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+      append('polyline', { points: lowPoints, fill: 'none', stroke: '#75d9b0', 'stroke-width': '3', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+
+      observations.forEach((item, i) => {
+        const xx = x(i), highY = y(item.high), lowY = y(item.low);
+        const highDot = append('circle', { cx: xx, cy: highY, r: '5.2', fill: '#c8f169', stroke: '#10221a', 'stroke-width': '2' });
+        highDot.appendChild(make('title', {}, `${item.day}, October ${item.dayNum}: maximum ${fmt(item.high)} °C`));
+        const lowDot = append('circle', { cx: xx, cy: lowY, r: '4.7', fill: '#75d9b0', stroke: '#10221a', 'stroke-width': '2' });
+        lowDot.appendChild(make('title', {}, `${item.day}, October ${item.dayNum}: minimum ${fmt(item.low)} °C`));
+        append('text', { x: xx, y: highY - 14, fill: '#d7f69a', 'font-size': '12', 'font-weight': '750', 'text-anchor': 'middle', 'font-family': 'inherit' }, fmt(item.high));
+        append('text', { x: xx, y: lowY + 21, fill: '#8ce4c1', 'font-size': '12', 'font-weight': '700', 'text-anchor': 'middle', 'font-family': 'inherit' }, fmt(item.low));
+        append('text', { x: xx, y: 357, fill: '#a6b9a8', 'font-size': '12', 'font-weight': '700', 'text-anchor': 'middle', 'font-family': 'inherit' }, item.shortDay);
+        append('text', { x: xx, y: 377, fill: '#718779', 'font-size': '11', 'text-anchor': 'middle', 'font-family': 'inherit' }, `OCT ${item.dayNum}`);
+      });
+      append('line', { x1: left, x2: W - right, y1: bottom, y2: bottom, stroke: '#d4e5d6', 'stroke-opacity': '.16' });
+    })();
+
+    // Populate the daily table from the same observations used by the chart.
+    const tableBody = document.getElementById('daily-table-body');
+    tableBody.innerHTML = '';
+    const minRange = Math.min(...observations.map(d => d.high - d.low));
+    const maxRange = Math.max(...observations.map(d => d.high - d.low));
+    observations.forEach(item => {
+      const range = item.high - item.low;
+      const normalizedWidth = maxRange === minRange ? 100 : 52 + ((range - minRange) / (maxRange - minRange)) * 42;
+      const row = document.createElement('tr');
+      row.innerHTML = `<td class="date-cell">${item.dayNum} Oct 2026<small>${item.day}</small></td><td class="value-high">${fmt(item.high)} °C</td><td class="value-low">${fmt(item.low)} °C</td><td>${fmt(range)} °C</td><td><div class="range-track" aria-label="Daily range ${fmt(range)} degrees Celsius"><span class="range-fill" style="left:4%;width:${normalizedWidth}%"></span></div></td>`;
+      tableBody.appendChild(row);
+    });
+  </script>
+</body>
+</html>
