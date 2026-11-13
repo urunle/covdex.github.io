@@ -1,0 +1,395 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101713">
+<title>Kerman Weather Archive | October 13–15, 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root {
+  --bg:#101713;
+  --card:#19221c;
+  --inner:#222d25;
+  --line:#354239;
+  --text:#f3f6ef;
+  --muted:#a0ada2;
+  --accent:#c8f169;
+  --orange:#ffbd79;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Inter,Arial,sans-serif;line-height:1.65;
+}
+a{color:inherit}
+.container{width:min(1160px,92%);margin:auto}
+header{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:20px;padding:25px 0;border-bottom:1px solid var(--line)
+}
+.identity{display:flex;align-items:center;gap:13px}
+.logo{
+  width:46px;height:46px;display:grid;place-items:center;
+  background:var(--accent);color:var(--bg);border-radius:15px
+}
+.brand{font-size:12px;font-weight:800;letter-spacing:1.4px}
+.author{font-size:17px;font-weight:800;margin-top:4px}
+.header-source{text-align:right;font-size:11px;color:var(--muted)}
+.header-source a,.source-link{color:var(--accent);text-decoration:none}
+.hero{padding:76px 0 48px}
+.eyebrow{
+  display:flex;align-items:center;gap:9px;color:var(--accent);
+  font-size:12px;font-weight:800;letter-spacing:1.7px
+}
+h1{
+  font-size:clamp(43px,8vw,88px);line-height:1.04;
+  letter-spacing:-4px;margin:24px 0;font-weight:900
+}
+h1 span{color:var(--accent)}
+.intro{max-width:700px;color:var(--muted);font-size:15px;line-height:1.9}
+.pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:25px}
+.pill{
+  display:flex;align-items:center;gap:8px;border:1px solid var(--line);
+  border-radius:30px;padding:8px 12px;color:var(--muted);font-size:11px
+}
+.section-head{
+  display:flex;align-items:end;justify-content:space-between;
+  gap:15px;margin:42px 0 20px
+}
+h2{font-size:clamp(25px,4vw,35px);letter-spacing:-1px;margin:0}
+.small{color:var(--muted);font-size:11px}
+.overview{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.overview-card,.day{
+  background:var(--card);border:1px solid var(--line);border-radius:23px
+}
+.overview-card{padding:22px}
+.label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px}
+.label i{color:var(--accent);width:17px}
+.big{font-size:clamp(31px,5vw,48px);font-weight:900;letter-spacing:-2px;margin:13px 0 4px}
+.big small{font-size:13px;letter-spacing:0;color:var(--muted)}
+.days{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.day{padding:22px;min-width:0;transition:border-color .2s}
+.day:hover{border-color:var(--accent)}
+.day-top{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.day-name{font-size:17px;font-weight:800}
+.date{font-size:11px;color:var(--muted);margin-top:4px}
+.day-icon{
+  width:44px;height:44px;display:grid;place-items:center;
+  background:var(--inner);color:var(--accent);border-radius:14px
+}
+.temp{display:flex;align-items:baseline;gap:13px;margin:25px 0 3px}
+.high{font-size:43px;font-weight:900;letter-spacing:-2px}
+.low{font-size:23px;font-weight:700;color:var(--muted)}
+.temp-labels{display:flex;gap:27px;color:var(--muted);font-size:10px}
+.rule{height:1px;background:var(--line);margin:23px 0}
+.subhead{
+  color:var(--muted);font-size:10px;letter-spacing:1.5px;
+  font-weight:800;margin:22px 0 11px
+}
+.data-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.data{
+  background:var(--inner);border-radius:13px;padding:12px 10px;min-width:0
+}
+.data-label{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:10px}
+.data-label i{width:14px;height:14px;flex-shrink:0}
+.value{font-size:13px;font-weight:700;margin-top:8px;overflow-wrap:anywhere}
+.na{font-size:11px;font-weight:500;color:#aab5ab}
+.note{
+  background:#1b261e;border:1px solid var(--line);border-radius:19px;
+  padding:21px;margin-top:28px
+}
+.note-title{display:flex;gap:9px;align-items:center;font-size:13px;font-weight:800}
+.note-title i{color:var(--accent)}
+.note p{font-size:12px;line-height:1.9;color:var(--muted);margin-bottom:0}
+.sources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.source-card{
+  padding:20px;background:var(--card);border:1px solid var(--line);
+  border-radius:18px;min-width:0
+}
+.source-card h3{font-size:14px;margin:0 0 8px}
+.source-card p{font-size:11px;color:var(--muted);line-height:1.8}
+.source-card a{color:var(--accent);font-size:11px;text-decoration:none}
+footer{
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
+  margin-top:45px;padding:25px 0;border-top:1px solid var(--line);
+  font-size:10px;color:var(--muted)
+}
+@media(max-width:850px){
+  .days{grid-template-columns:1fr}
+  .overview{grid-template-columns:1fr}
+  .sources{grid-template-columns:1fr}
+  .hero{padding-top:50px}
+  .day{padding:22px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="identity">
+    <div class="logo"><i data-lucide="cloud-sun" width="25"></i></div>
+    <div>
+      <div class="brand">WEATHER ARCHIVE</div>
+      <div class="author">محمدرضا حیدری</div>
+    </div>
+  </div>
+  <div class="header-source">
+    HISTORICAL WEATHER REPORT<br>
+    <a href="https://mesonet3.agron.iastate.edu/sites/hist.phtml?network=IR__ASOS&station=OIKK"
+       target="_blank" rel="noopener noreferrer">OBSERVATION ARCHIVE ↗</a>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="eyebrow">
+    <i data-lucide="map-pin" width="16"></i>
+    KERMAN, IRAN
+  </div>
+  <h1>Weather,<br><span>By the Data.</span></h1>
+  <p class="intro">
+    A historical weather report for October 13–15, 2026.
+    Daily temperatures and available station observations are
+    presented in metric units. Every measurement is identified
+    by its source and availability.
+  </p>
+  <div class="pills">
+    <span class="pill"><i data-lucide="calendar" width="15"></i> OCT 13–15, 2026</span>
+    <span class="pill"><i data-lucide="thermometer" width="15"></i> °C / km/h / mm</span>
+    <span class="pill"><i data-lucide="database" width="15"></i> HISTORICAL OBSERVATIONS</span>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <h2>Three-Day Overview</h2>
+    <span class="small">Station archive · Rounded values</span>
+  </div>
+  <div class="overview">
+    <div class="overview-card">
+      <div class="label"><i data-lucide="thermometer-sun"></i> HIGHEST OBSERVED TEMPERATURE</div>
+      <div class="big">29.0° <small>C</small></div>
+      <div class="small">October 13, 2026</div>
+    </div>
+    <div class="overview-card">
+      <div class="label"><i data-lucide="thermometer-snowflake"></i> LOWEST OBSERVED TEMPERATURE</div>
+      <div class="big">11.0° <small>C</small></div>
+      <div class="small">October 15, 2026</div>
+    </div>
+    <div class="overview-card">
+      <div class="label"><i data-lucide="cloud-rain"></i> VERIFIED RAINFALL</div>
+      <div class="big">0 <small>mm*</small></div>
+      <div class="small">October 13 only · Weather Underground</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <h2>Daily Measurements</h2>
+    <span class="small">Local dates · Kerman station</span>
+  </div>
+  <div class="days" id="days"></div>
+</section>
+
+<section>
+  <div class="section-head">
+    <h2>Data Sources</h2>
+    <span class="small">Original reference pages</span>
+  </div>
+  <div class="sources">
+    <article class="source-card">
+      <h3>Iowa Environmental Mesonet</h3>
+      <p>
+        Station archive for Kerman (OIKK). Daily maximum and minimum
+        temperatures, apparent temperature, dew point and reported
+        peak gusts where available.
+      </p>
+      <a href="https://mesonet3.agron.iastate.edu/sites/hist.phtml?network=IR__ASOS&station=OIKK"
+         target="_blank" rel="noopener noreferrer">OPEN STATION ARCHIVE ↗</a>
+    </article>
+    <article class="source-card">
+      <h3>Weather Underground</h3>
+      <p>
+        Daily historical summary and hourly observations for
+        October 13, 2026, including precipitation, maximum wind
+        speed and visibility.
+      </p>
+      <a href="https://www.wunderground.com/history/daily/ir/kerman-county/date/2026-10-13"
+         target="_blank" rel="noopener noreferrer">OPEN DAILY HISTORY ↗</a>
+    </article>
+    <article class="source-card">
+      <h3>World Weather Information Service</h3>
+      <p>
+        World Meteorological Organization city page, including
+        Kerman reference climatology and astronomy information.
+        Climate normals are not daily observations.
+      </p>
+      <a href="https://worldweather.wmo.int/en/city.html?cityId=941"
+         target="_blank" rel="noopener noreferrer">OPEN WMO CITY PAGE ↗</a>
+    </article>
+  </div>
+</section>
+
+<aside class="note">
+  <div class="note-title">
+    <i data-lucide="info" width="19"></i>
+    DATA QUALITY & INTERPRETATION
+  </div>
+  <p>
+    Temperatures, apparent temperatures, dew points and the October 14
+    peak gust are from the Iowa Environmental Mesonet daily archive.
+    October 13 precipitation, maximum wind speed and visibility are
+    from Weather Underground. The sources use different reporting
+    methods and are not a single continuous sensor record. Missing
+    values are labelled “Not reported”; they do not mean zero.
+    Daily evaporation, humidity and atmospheric pressure could not
+    be independently verified for all three dates, so they are not
+    estimated. A station measurement is not necessarily identical
+    to conditions at every location within Kerman.
+  </p>
+</aside>
+</main>
+
+<footer>
+  <span>PREPARED BY محمدرضا حیدری</span>
+  <span>Historical observations · October 13–15, 2026</span>
+</footer>
+</div>
+
+<script>
+const days = [
+  {
+    name:"Tuesday",
+    date:"October 13, 2026",
+    high:29.0, low:13.0,
+    feelsLow:13.0, feelsHigh:27.4,
+    dewLow:-1.0, dewHigh:3.0,
+    gust:"Not reported",
+    humidity:"Not reported",
+    wind:"Max 19.3 km/h",
+    precipitation:"0 mm",
+    visibility:"9.7 km",
+    pressure:"Not reported",
+    evaporation:"Not reported",
+    source:"IEM + Weather Underground"
+  },
+  {
+    name:"Wednesday",
+    date:"October 14, 2026",
+    high:28.0, low:12.0,
+    feelsLow:12.0, feelsHigh:26.7,
+    dewLow:-1.0, dewHigh:2.0,
+    gust:"38.6 km/h · N",
+    humidity:"Not reported",
+    wind:"Not reported",
+    precipitation:"Not reported",
+    visibility:"Not reported",
+    pressure:"Not reported",
+    evaporation:"Not reported",
+    source:"Iowa Environmental Mesonet"
+  },
+  {
+    name:"Thursday",
+    date:"October 15, 2026",
+    high:28.0, low:11.0,
+    feelsLow:11.0, feelsHigh:26.6,
+    dewLow:-2.0, dewHigh:1.0,
+    gust:"Not reported",
+    humidity:"Not reported",
+    wind:"Not reported",
+    precipitation:"Not reported",
+    visibility:"Not reported",
+    pressure:"Not reported",
+    evaporation:"Not reported",
+    source:"Iowa Environmental Mesonet"
+  }
+];
+
+const fields = [
+  ["Apparent temperature","thermometer","feels"],
+  ["Dew point","droplets","dew"],
+  ["Peak wind gust","wind","gust"],
+  ["Wind speed","wind","wind"],
+  ["Relative humidity","droplets","humidity"],
+  ["Precipitation","cloud-rain","precipitation"],
+  ["Visibility","eye","visibility"],
+  ["Air pressure","gauge","pressure"],
+  ["Evaporation","sun","evaporation"]
+];
+
+const unavailable = value =>
+  value === "Not reported"
+    ? '<span class="na">Not reported</span>'
+    : value;
+
+document.getElementById("days").innerHTML = days.map(d => `
+  <article class="day">
+    <div class="day-top">
+      <div>
+        <div class="day-name">${d.name}</div>
+        <div class="date">${d.date}</div>
+      </div>
+      <div class="day-icon"><i data-lucide="sun" width="25"></i></div>
+    </div>
+
+    <div class="temp">
+      <span class="high">${d.high.toFixed(0)}°</span>
+      <span class="low">${d.low.toFixed(0)}°</span>
+    </div>
+    <div class="temp-labels"><span>HIGH °C</span><span>LOW °C</span></div>
+
+    <div class="rule"></div>
+    <div class="subhead">OBSERVED TEMPERATURE</div>
+    <div class="data-grid">
+      <div class="data">
+        <div class="data-label"><i data-lucide="thermometer-sun"></i> Daily high</div>
+        <div class="value">${d.high.toFixed(1)} °C</div>
+      </div>
+      <div class="data">
+        <div class="data-label"><i data-lucide="thermometer-snowflake"></i> Daily low</div>
+        <div class="value">${d.low.toFixed(1)} °C</div>
+      </div>
+      <div class="data">
+        <div class="data-label"><i data-lucide="thermometer"></i> Feels-like range</div>
+        <div class="value">${d.feelsLow.toFixed(1)}–${d.feelsHigh.toFixed(1)} °C</div>
+      </div>
+      <div class="data">
+        <div class="data-label"><i data-lucide="droplets"></i> Dew point range</div>
+        <div class="value">${d.dewLow.toFixed(0)}–${d.dewHigh.toFixed(0)} °C</div>
+      </div>
+    </div>
+
+    <div class="subhead">ATMOSPHERIC CONDITIONS</div>
+    <div class="data-grid">
+      ${fields.map(([label, icon, key]) => {
+        let value;
+        if (key === "feels") value = `${d.feelsLow.toFixed(1)}–${d.feelsHigh.toFixed(1)} °C`;
+        else if (key === "dew") value = `${d.dewLow.toFixed(0)}–${d.dewHigh.toFixed(0)} °C`;
+        else value = d[key];
+        return `
+          <div class="data">
+            <div class="data-label"><i data-lucide="${icon}"></i>${label}</div>
+            <div class="value">${unavailable(value)}</div>
+          </div>`;
+      }).join("")}
+    </div>
+
+    <div class="rule"></div>
+    <div class="data-label"><i data-lucide="database"></i> DATA SOURCE</div>
+    <div class="value" style="font-size:11px">${d.source}</div>
+  </article>
+`).join("");
+
+lucide.createIcons();
+</script>
+</body>
+</html>
